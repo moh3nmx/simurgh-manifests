@@ -5,7 +5,7 @@ const authenticateUrl = `${configs.Users}authenticate`;
 
 export const login = async () => {
   try {
-    const { data } = await axios.post(authenticateUrl, {
+    const data = await axios.post(authenticateUrl, {
       username: "superAdmin",
       password: "superAdmin1@3",
     });

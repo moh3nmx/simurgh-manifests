@@ -31,19 +31,32 @@
         >
           <!-- classification -->
           <template #[`item.classification`]="{ item }">
-            <div
-              class="d-flex align-center"
-              v-for="(c, i) in item.classification"
-              :key="item.id + '-' + i"
-              style="min-height: 43px"
-            >
-              <div style="width: calc(50% - 4.5px)" class="text-truncate">
-                {{ c.language }}
+            <div v-for="(c, i) in item.classification" :key="item.id + '-' + i">
+              <div class="d-flex align-center" style="min-height: 43px">
+                <div style="width: calc(30% - 4.5px)" class="text-truncate">
+                  {{ c.language }}
+                </div>
+                <v-divider vertical class="mx-1" />
+                <div style="width: calc(70% - 4.5px)">
+                  {{ c.value }}
+                </div>
               </div>
-              <v-divider vertical class="mx-1" />
-              <div style="width: calc(50% - 4.5px)">
-                {{ c.value }}
+              <v-divider v-if="i < item.classification.length - 1"></v-divider>
+            </div>
+          </template>
+          <!-- subject -->
+          <template #[`item.subject`]="{ item }">
+            <div v-for="(c, i) in item.subject" :key="item.id + '-' + i">
+              <div class="d-flex align-center" style="min-height: 43px">
+                <div style="width: calc(30% - 4.5px)" class="text-truncate">
+                  {{ c.language }}
+                </div>
+                <v-divider vertical class="mx-1" />
+                <div style="width: calc(70% - 4.5px)">
+                  {{ c.value }}
+                </div>
               </div>
+              <v-divider v-if="i < item.subject.length - 1"></v-divider>
             </div>
           </template>
           <!-- Sequence Report -->
@@ -59,6 +72,7 @@
               <manifest-options
                 v-if="selected == item.id"
                 @deselect="selected = null"
+                @open-meta="openMeta(item, $event)"
                 aboslute
                 :position-x="menuX"
                 :position-y="menuY"
@@ -99,15 +113,19 @@
           :total-visible="7"
           class="mt-4"
         />
+
+        <ManifestMetaData ref="meta" @update="getManifestList" />
       </v-card-text>
     </v-card>
   </v-container>
 </template>
 <script>
-import { manifestListService } from "../services/manifest.service";
-import ManifestOptions from "./ManifestOptions.vue";
+import { getManifestList } from "../../services/manifest.service";
+import ManifestOptions from "./Options.vue";
+import ManifestMetaData from "./MetaData.vue";
 export default {
-  components: { ManifestOptions },
+  name: "ManifestGrid",
+  components: { ManifestOptions, ManifestMetaData },
   data() {
     return {
       filters: {
@@ -142,9 +160,9 @@ export default {
           width: 200,
           align: "center",
         },
-        { value: "subject", text: "Subject", width: 100, align: "center" },
-        { value: "technique", text: "Technique", width: 100, align: "center" },
-        { value: "medium", text: "Medium", width: 100, align: "center" },
+        { value: "subject", text: "Subject", width: 200, align: "center" },
+        { value: "technique", text: "Technique", width: 200, align: "center" },
+        { value: "medium", text: "Medium", width: 200, align: "center" },
         { value: "period", text: "Period", align: "center" },
         { value: "dynasty", text: "Dynasty", align: "center" },
         { value: "place", text: "Place", align: "center" },
@@ -164,6 +182,10 @@ export default {
     this.getManifestList();
   },
   methods: {
+    openMeta(item, type) {
+      console.log(item, type);
+      this.$refs.meta.open(item, type);
+    },
     setMenuPosition(e) {
       console.log(e);
       this.menuX = e.pageX;
@@ -175,7 +197,7 @@ export default {
     async getManifestList() {
       this.loading = true;
       try {
-        const { result, totalPages, totalCount } = await manifestListService(
+        const { result, totalPages, totalCount } = await getManifestList(
           this.filters
         );
         this.items = result;

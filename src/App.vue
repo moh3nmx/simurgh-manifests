@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import ManifestGrid from './components/ManifestGrid.vue'
+import ManifestGrid from './components/Manifest/Grid.vue'
 export default {
   name: 'App',
 
