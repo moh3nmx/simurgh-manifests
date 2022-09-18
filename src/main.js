@@ -3,13 +3,14 @@ import App from './App.vue'
 import store from './store'
 import vuetify from './plugins/vuetify'
 import BaseLabel from '@/components/Base/Label.vue'
+import BasePrompt from '@/components/Base/Prompt.vue'
 import '@/assets/app.scss'
-import './plugins/axios'
 import Toasted from 'vue-toasted';
  
 Vue.config.productionTip = false
 
 Vue.component('BaseLabel', BaseLabel)
+Vue.component('BasePrompt', BasePrompt)
 Vue.use(Toasted, {
   position: 'bottom-left',
   duration: 5000,
@@ -20,6 +21,8 @@ Vue.use(Toasted, {
     }
 },
 })
+
+import './plugins/axios'
 
 Object.defineProperty(String.prototype, 'capitalize', {
   value: function() {

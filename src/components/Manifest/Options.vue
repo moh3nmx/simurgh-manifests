@@ -29,8 +29,9 @@
         <v-card-text>
           <div>
             <v-btn small color="primary" depressed class="mr-2">View</v-btn>
-            <v-btn small color="info" depressed class="mr-2">Edit</v-btn>
-            <v-btn small color="error" depressed class="mr-2">Delete</v-btn>
+            <v-btn small color="info" depressed class="mr-2" >Draft</v-btn>
+            <v-btn small color="success" depressed class="mr-2" @click="$emit('publish')">Publish</v-btn>
+            <v-btn small color="error" depressed class="mr-2" @click="$emit('delete')">Delete</v-btn>
           </div>
           <v-divider class="my-4"></v-divider>
           <div>
@@ -58,7 +59,7 @@ export default {
   data() {
     return {
       menu: true,
-      buttons: ["classification", "subject", "technique", "medium"],
+      buttons: ["classification", "subject", "technique", "medium", "period", "dynasty", "place", "century", "culture", "publisher"],
     };
   },
   mounted() {},

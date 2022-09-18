@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import Vue from 'vue'
 import * as configs from "./apiconfig";
 const authenticateUrl = `${configs.Users}authenticate`;
 
@@ -41,7 +41,16 @@ axios.interceptors.response.use(
     return response.data || response
   },
   async (error) => {
-    if (error.response.status === 403 || error.response.status === 401) {
+    if(typeof error.config.toast !== 'boolean' || !!error.config.toast) {
+      let message = 'Error while connecting to server'
+      if(error.response && error.response.data && error.response.data.Message) {
+        message = error.response.data.Message
+      } else if(error.response && error.response.statusText) {
+        message = error.response.statusText
+      }
+      Vue.toasted.error(message)
+    }
+    if (error.response.status === 401) {
       localStorage.clear();
       await login();
 

@@ -59,6 +59,97 @@
               <v-divider v-if="i < item.subject.length - 1"></v-divider>
             </div>
           </template>
+          <!-- technique -->
+          <template #[`item.technique`]="{ item }">
+            <div v-for="(c, i) in item.technique" :key="item.id + '-' + i">
+              <div class="d-flex align-center" style="min-height: 43px">
+                <div style="width: calc(30% - 4.5px)" class="text-truncate">
+                  {{ c.language }}
+                </div>
+                <v-divider vertical class="mx-1" />
+                <div style="width: calc(70% - 4.5px)">
+                  {{ c.value }}
+                </div>
+              </div>
+              <v-divider v-if="i < item.technique.length - 1"></v-divider>
+            </div>
+          </template>
+          <!-- medium -->
+          <template #[`item.medium`]="{ item }">
+            <div v-for="(c, i) in item.medium" :key="item.id + '-' + i">
+              <div class="d-flex align-center" style="min-height: 43px">
+                <div style="width: calc(30% - 4.5px)" class="text-truncate">
+                  {{ c.language }}
+                </div>
+                <v-divider vertical class="mx-1" />
+                <div style="width: calc(70% - 4.5px)">
+                  {{ c.value }}
+                </div>
+              </div>
+              <v-divider v-if="i < item.medium.length - 1"></v-divider>
+            </div>
+          </template>
+          <!-- period -->
+          <template #[`item.period`]="{ item }">
+            <div v-for="(c, i) in item.period" :key="item.id + '-' + i">
+              <div class="d-flex align-center" style="min-height: 43px">
+                <div style="width: calc(30% - 4.5px)" class="text-truncate">
+                  {{ c.language }}
+                </div>
+                <v-divider vertical class="mx-1" />
+                <div style="width: calc(70% - 4.5px)">
+                  {{ c.value }}
+                </div>
+              </div>
+              <v-divider v-if="i < item.period.length - 1"></v-divider>
+            </div>
+          </template>
+          <!-- dynasty -->
+          <template #[`item.dynasty`]="{ item }">
+            <div v-for="(c, i) in item.dynasty" :key="item.id + '-' + i">
+              <div class="d-flex align-center" style="min-height: 43px">
+                <div style="width: calc(30% - 4.5px)" class="text-truncate">
+                  {{ c.language }}
+                </div>
+                <v-divider vertical class="mx-1" />
+                <div style="width: calc(70% - 4.5px)">
+                  {{ c.value }}
+                </div>
+              </div>
+              <v-divider v-if="i < item.dynasty.length - 1"></v-divider>
+            </div>
+          </template>
+          <!-- place -->
+          <template #[`item.place`]="{ item }">
+            <div v-for="(c, i) in item.place" :key="item.id + '-' + i">
+              <div class="d-flex align-center" style="min-height: 43px">
+                <div style="width: calc(30% - 4.5px)" class="text-truncate">
+                  {{ c.language }}
+                </div>
+                <v-divider vertical class="mx-1" />
+                <div style="width: calc(70% - 4.5px)">
+                  {{ c.value }}
+                </div>
+              </div>
+              <v-divider v-if="i < item.place.length - 1"></v-divider>
+            </div>
+          </template>
+          <!-- century -->
+          <template #[`item.century`]="{ item }">
+            <div v-for="(c, i) in item.century" :key="item.id + '-' + i">
+              <div class="d-flex align-center" style="min-height: 43px">
+                <div style="width: calc(30% - 4.5px)" class="text-truncate">
+                  {{ c.language }}
+                </div>
+                <v-divider vertical class="mx-1" />
+                <div style="width: calc(70% - 4.5px)">
+                  {{ c.value }}
+                </div>
+              </div>
+              <v-divider v-if="i < item.century.length - 1"></v-divider>
+            </div>
+          </template>
+
           <!-- Sequence Report -->
           <template #[`item.id`]="{ item }">
             <div class="d-flex align-center">
@@ -73,6 +164,7 @@
                 v-if="selected == item.id"
                 @deselect="selected = null"
                 @open-meta="openMeta(item, $event)"
+                @delete="openDeletePrompt(item)"
                 aboslute
                 :position-x="menuX"
                 :position-y="menuY"
@@ -115,12 +207,21 @@
         />
 
         <ManifestMetaData ref="meta" @update="getManifestList" />
+
+        <base-prompt
+          ref="prompt"
+          @accept="deleteManifest"
+          :loading="deleting"
+        />
       </v-card-text>
     </v-card>
   </v-container>
 </template>
 <script>
-import { getManifestList } from "../../services/manifest.service";
+import {
+  getManifestList,
+  deleteManifest,
+} from "../../services/manifest.service";
 import ManifestOptions from "./Options.vue";
 import ManifestMetaData from "./MetaData.vue";
 export default {
@@ -163,10 +264,10 @@ export default {
         { value: "subject", text: "Subject", width: 200, align: "center" },
         { value: "technique", text: "Technique", width: 200, align: "center" },
         { value: "medium", text: "Medium", width: 200, align: "center" },
-        { value: "period", text: "Period", align: "center" },
-        { value: "dynasty", text: "Dynasty", align: "center" },
-        { value: "place", text: "Place", align: "center" },
-        { value: "century", text: "Century", align: "center" },
+        { value: "period", text: "Period", width: 200, align: "center" },
+        { value: "dynasty", text: "Dynasty", width: 200, align: "center" },
+        { value: "place", text: "Place", width: 200, align: "center" },
+        { value: "century", text: "Century", width: 200, align: "center" },
         {
           value: "sequenceReport",
           text: "Sequence Report",
@@ -176,12 +277,17 @@ export default {
         { value: "culture", text: "Culture", align: "center" },
         { value: "publisher", text: "Publisher", align: "right" },
       ],
+
+      deleting: false,
     };
   },
   created() {
     this.getManifestList();
   },
   methods: {
+    openDeletePrompt(item) {
+      this.$refs.prompt.open(item);
+    },
     openMeta(item, type) {
       console.log(item, type);
       this.$refs.meta.open(item, type);
@@ -193,6 +299,18 @@ export default {
     },
     rowClass(e) {
       return e.id === this.selected ? "blue lighten-5" : "";
+    },
+    async deleteManifest(item) {
+      this.deleting = true;
+      try {
+        await deleteManifest(item.id);
+        this.$toasted.success("Manifest Deleted!");
+        this.$refs.prompt.close()
+        this.getManifestList();
+      } catch (e) {
+        console.log(e);
+      }
+      this.deleting = false;
     },
     async getManifestList() {
       this.loading = true;

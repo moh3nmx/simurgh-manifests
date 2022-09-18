@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-dialog v-model="dialog" max-width="500" persistent>
-      <v-card :disabled="saving || fetching" >
+      <v-card :disabled="saving || fetching" :loading="fetching">
         <v-card-title>
           {{ title }}
           <v-spacer></v-spacer>
@@ -11,14 +11,21 @@
         <v-card-text>
           <v-card outlined>
             <v-data-table
-              :loading="fetching"
               :items-per-page="20"
               hide-default-footer
               dense
               :items="metaData"
               :headers="tableHeaders"
               disable-sort
-            ></v-data-table>
+            >
+          <template #[`item.action`]="{item}">
+            <v-btn icon small color="error" @click="openDeletePrompt(item)">
+              <v-icon small>
+                mdi-close
+              </v-icon>
+            </v-btn>
+          </template>
+          </v-data-table>
           </v-card>
 
           <v-form class="mt-6">
@@ -45,11 +52,13 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
+    <base-prompt ref="prompt" :loading="fetching" @accept="deleteMetaData" />
   </div>
 </template>
 <script>
 import { Enrich } from "@/plugins/apiconfig";
-import { getMetaData, saveMetaData } from "@/services/manifest.service";
+import { getMetaData, saveMetaData, deleteMetaData } from "@/services/manifest.service";
 export default {
   data() {
     return {
@@ -71,6 +80,10 @@ export default {
           value: "value",
           text: "Value",
         },
+        {
+          value: 'action',
+          text: ''
+        }
       ],
       metaData: [],
       languages: [
@@ -95,6 +108,9 @@ export default {
         this.getMetaData();
       }
       this.dialog = true;
+    },
+    openDeletePrompt(item) {
+      this.$refs.prompt.open(item)
     },
     close(){
       this.dialog = false
@@ -127,6 +143,17 @@ export default {
         console.log(e);
       }
       this.saving = false;
+    },
+    async deleteMetaData(item) {
+      this.fetching = true;
+      try {
+        await deleteMetaData(this.endpoint, item);
+        await this.getMetaData();
+        this.$toasted.success(this.type.capitalize() + ' Meta Data Deleted!')
+      } catch (e) {
+        console.log(e);
+      }
+      this.fetching = false;
     },
   },
   computed: {
